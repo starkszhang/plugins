@@ -37,6 +37,58 @@
 
 @implementation FLTWKWebView
 
+FlutterMethodChannel *_methodChannel;
+
+- (instancetype)initWithChannel:(FlutterMethodChannel *)channel {
+  if (self) {
+    _methodChannel = channel;
+    self.scrollView.delegate = self;
+    [self createMenu];
+  }
+  return self;
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    int x = scrollView.contentOffset.x/scrollView.contentScaleFactor;
+    int y = scrollView.contentOffset.y/scrollView.contentScaleFactor;
+    [_methodChannel invokeMethod:@"onScrollChanged" arguments:@{@"x" :[NSNumber numberWithInt:x],@"y":[NSNumber numberWithInt:y]}];
+    [self setNeedsLayout];
+}
+
+#pragma mark 自定义长按菜单
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    if (action ==@selector(select:) ||
+        action == @selector(copy:) ||
+        action == @selector(cut:) ||
+        action == @selector(paste:) ||
+        action == @selector(customShare:)
+        ) {
+        return [super canPerformAction:action withSender:sender];
+    }
+    //return [super canPerformAction:action withSender:sender];
+    return NO;
+}
+
+
+//构建UIMenuController
+- (void)createMenu {
+    UIMenuItem *flag = [[UIMenuItem alloc] initWithTitle:@"分享" action:@selector(customShare:)];
+    UIMenuController *menu = [UIMenuController sharedMenuController];
+    [menu setMenuItems:[NSArray arrayWithObjects:flag, nil]];
+    [menu setMenuVisible:YES];
+}
+
+- (void)customShare:(id)sender{
+    [self evaluateJavaScript:@"window.getSelection().toString();"
+           completionHandler:^(_Nullable id evaluateResult, NSError* _Nullable error) {
+             if (error == nil) {
+                 NSLog(@"%@", evaluateResult);
+                 [_methodChannel invokeMethod:@"onSelectText" arguments:@{@"url" : self.URL.absoluteString,@"text":evaluateResult}];
+
+             }
+     }];
+}
+
 - (void)setFrame:(CGRect)frame {
   [super setFrame:frame];
   self.scrollView.contentInset = UIEdgeInsetsZero;
@@ -95,6 +147,7 @@
                         inConfiguration:configuration];
 
     _webView = [[FLTWKWebView alloc] initWithFrame:frame configuration:configuration];
+    [_webView initWithChannel:_channel];
     _navigationDelegate = [[FLTWKNavigationDelegate alloc] initWithChannel:_channel];
     _webView.UIDelegate = self;
     _webView.navigationDelegate = _navigationDelegate;
