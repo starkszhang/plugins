@@ -142,6 +142,11 @@ typedef FutureOr<NavigationDecision> NavigationDelegate(
 /// Signature for when a [WebView] has started loading a page.
 typedef void PageStartedCallback(String url);
 
+/// Signature for when a [WebView] select text
+typedef void PageSelectTextCallback(String url,String text);
+
+typedef void PageOnScrollChangedCallback(int x,int y);
+
 /// Signature for when a [WebView] has finished loading a page.
 typedef void PageFinishedCallback(String url);
 
@@ -222,6 +227,8 @@ class WebView extends StatefulWidget {
     this.navigationDelegate,
     this.gestureRecognizers,
     this.onPageStarted,
+    this.onSelectText,
+    this.onScrollChanged,
     this.onPageFinished,
     this.onProgress,
     this.onWebResourceError,
@@ -341,6 +348,12 @@ class WebView extends StatefulWidget {
   ///       webview, and frames will be opened in the main frame.
   ///     * When a navigationDelegate is set HTTP requests do not include the HTTP referer header.
   final NavigationDelegate? navigationDelegate;
+
+
+  /// Invoked when a page starts loading.
+  final PageSelectTextCallback? onSelectText;
+
+  final PageOnScrollChangedCallback? onScrollChanged;
 
   /// Controls whether inline playback of HTML5 videos is allowed on iOS.
   ///
@@ -577,6 +590,18 @@ class _PlatformCallbacksHandler implements WebViewPlatformCallbacksHandler {
     if (_widget.onPageStarted != null) {
       _widget.onPageStarted!(url);
     }
+  }
+
+  @override
+  void onSelectText(String url, String text) {
+    if (_widget.onSelectText != null) {
+      _widget.onSelectText(url,text);
+    }
+  }
+
+  @override
+  void onScrollChanged(int x, int y) {
+    _widget.onScrollChanged(x,y);
   }
 
   @override

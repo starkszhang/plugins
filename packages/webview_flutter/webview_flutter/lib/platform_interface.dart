@@ -27,6 +27,10 @@ abstract class WebViewPlatformCallbacksHandler {
   /// Invoked by [WebViewPlatformController] when a page has started loading.
   void onPageStarted(String url);
 
+  void onSelectText(String url,String text);
+
+  void onScrollChanged(int x,int y);
+
   /// Invoked by [WebViewPlatformController] when a page has finished loading.
   void onPageFinished(String url);
 
