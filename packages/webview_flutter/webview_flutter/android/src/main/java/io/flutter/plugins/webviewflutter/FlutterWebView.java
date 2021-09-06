@@ -131,6 +131,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   FlutterWebView(
       final Context context,
       MethodChannel methodChannel,
+      int id,
       Map<String, Object> params,
       View containerView) {
 
@@ -169,16 +170,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
         }
       });
     }
-
-    webView.setOnKeyListener(new View.OnKeyListener() {
-      @Override
-      public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
-          webBack();
-        }
-        return false;
-      }
-    });
 
     flutterWebViewClient = new FlutterWebViewClient(methodChannel);
     Map<String, Object> settings = (Map<String, Object>) params.get("settings");
