@@ -30,7 +30,7 @@ public class WebViewBuilder {
      *     IME, thread (see also {@link InputAwareWebView})
      * @return A new instance of the {@link android.webkit.WebView} object.
      */
-    static WebView create(Context context, boolean usesHybridComposition, View containerView, methodChannel) {
+    static WebView create(Context context, boolean usesHybridComposition, View containerView,MethodChannel methodChannel) {
       return usesHybridComposition
           ? new WebView(context)
           : new InputAwareWebView(context, containerView, methodChannel);
