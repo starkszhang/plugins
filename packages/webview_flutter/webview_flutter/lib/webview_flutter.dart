@@ -595,14 +595,14 @@ class _PlatformCallbacksHandler implements WebViewPlatformCallbacksHandler {
   @override
   void onSelectText(String url, String text) {
     if (_widget!=null&&_widget.onSelectText != null) {
-      _widget.onSelectText(url,text);
+      _widget.onSelectText!(url,text);
     }
   }
 
   @override
   void onScrollChanged(int x, int y) {
     if (_widget!=null&&_widget.onScrollChanged != null) {
-      _widget.onScrollChanged(x, y);
+      _widget.onScrollChanged!(x, y);
     }
   }
 
