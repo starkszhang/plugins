@@ -11,6 +11,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import io.flutter.plugin.common.MethodChannel;
 
 /** Builder used to create {@link android.webkit.WebView} objects. */
 public class WebViewBuilder {
@@ -29,10 +30,10 @@ public class WebViewBuilder {
      *     IME, thread (see also {@link InputAwareWebView})
      * @return A new instance of the {@link android.webkit.WebView} object.
      */
-    static WebView create(Context context, boolean usesHybridComposition, View containerView) {
+    static WebView create(Context context, boolean usesHybridComposition, View containerView, methodChannel) {
       return usesHybridComposition
           ? new WebView(context)
-          : new InputAwareWebView(context, containerView);
+          : new InputAwareWebView(context, containerView, methodChannel);
     }
   }
 
@@ -44,6 +45,7 @@ public class WebViewBuilder {
   private boolean supportMultipleWindows;
   private boolean usesHybridComposition;
   private WebChromeClient webChromeClient;
+  private MethodChannel methodChannel;
 
   /**
    * Constructs a new {@link WebViewBuilder} object with a custom implementation of the {@link
@@ -54,9 +56,10 @@ public class WebViewBuilder {
    *     {@code false}. Used to create an InputConnection on the WebView's dedicated input, or IME,
    *     thread (see also {@link InputAwareWebView})
    */
-  WebViewBuilder(@NonNull final Context context, View containerView) {
+  WebViewBuilder(@NonNull final Context context, View containerView,MethodChannel methodChannel) {
     this.context = context;
     this.containerView = containerView;
+    this.methodChannel = methodChannel;
   }
 
   /**
@@ -121,14 +124,13 @@ public class WebViewBuilder {
     this.webChromeClient = webChromeClient;
     return this;
   }
-
   /**
    * Build the {@link android.webkit.WebView} using the current settings.
    *
    * @return The {@link android.webkit.WebView} using the current settings.
    */
   public WebView build() {
-    WebView webView = WebViewFactory.create(context, usesHybridComposition, containerView);
+    WebView webView = WebViewFactory.create(context, usesHybridComposition, containerView, methodChannel);
 
     WebSettings webSettings = webView.getSettings();
     webSettings.setDomStorageEnabled(enableDomStorage);

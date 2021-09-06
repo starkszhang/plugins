@@ -3,9 +3,17 @@
 // found in the LICENSE file.
 
 package io.flutter.plugins.webviewflutter;
+import android.content.Intent;
+import android.os.Build;
+import android.webkit.WebChromeClient;
+
+import androidx.annotation.NonNull;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
+import io.flutter.plugin.common.PluginRegistry;
 
 /**
  * Java platform implementation of the webview_flutter plugin.
@@ -15,7 +23,7 @@ import io.flutter.plugin.common.BinaryMessenger;
  * <p>Call {@link #registerWith(Registrar)} to use the stable {@code io.flutter.plugin.common}
  * package instead.
  */
-public class WebViewFlutterPlugin implements FlutterPlugin {
+public class WebViewFlutterPlugin implements FlutterPlugin, ActivityAware, PluginRegistry.ActivityResultListener {
 
   private FlutterCookieManager flutterCookieManager;
 
@@ -69,5 +77,39 @@ public class WebViewFlutterPlugin implements FlutterPlugin {
 
     flutterCookieManager.dispose();
     flutterCookieManager = null;
+    FlutterWebView.uploadMessage = null;
+  }
+
+  @Override
+  public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+    binding.addActivityResultListener(this);
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+    binding.addActivityResultListener(this);
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+
+  }
+
+  @Override
+  public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
+    if (requestCode == FlutterWebView.FILE_CHOOSER_RESULT_CODE) {
+      if (FlutterWebView.uploadMessage == null)
+        return false;
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        FlutterWebView.uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
+      }
+      FlutterWebView.uploadMessage = null;
+    }
+    return  true;
   }
 }
