@@ -131,12 +131,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   FlutterWebView(
       final Context context,
       MethodChannel methodChannel,
-      int id,
       Map<String, Object> params,
       View containerView) {
-
-    methodChannel = new MethodChannel(messenger, "plugins.flutter.io/webview_" + id);
-    methodChannel.setMethodCallHandler(this);
 
     DisplayListenerProxy displayListenerProxy = new DisplayListenerProxy();
     DisplayManager displayManager =
