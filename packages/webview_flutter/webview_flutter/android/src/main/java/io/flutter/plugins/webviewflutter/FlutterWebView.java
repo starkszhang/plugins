@@ -130,7 +130,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   @SuppressWarnings("unchecked")
   FlutterWebView(
       final Context context,
-      MethodChannel methodChannel,
+      final MethodChannel methodChannel,
       Map<String, Object> params,
       View containerView) {
 
